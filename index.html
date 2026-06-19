@@ -979,11 +979,11 @@ function renderFullSchedule(){
 // RENDER FAV GROUP STANDINGS (Home tab mini tables)
 // ============================================================
 function renderFavGroupStandings(){
-  // Groups A (South Korea), C (Haiti), D (USA)
+  // Groups A (South Korea), D (USA), C (Haiti)
   const favGroups = [
     {grp:'A', favTeam:'South Korea'},
-    {grp:'C', favTeam:'Haiti'},
-    {grp:'D', favTeam:'United States'}
+    {grp:'D', favTeam:'United States'},
+    {grp:'C', favTeam:'Haiti'}
   ];
   const grid = document.getElementById('favGroupStandingsGrid');
   grid.innerHTML = favGroups.map(({grp, favTeam})=>{
