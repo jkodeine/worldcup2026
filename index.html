@@ -270,6 +270,15 @@ body { background: var(--bg); color: var(--text); font-family: -apple-system, Bl
 .search-highlight { background: #fef08a; color: #000; border-radius: 2px; padding: 0 1px; }
 [data-theme="dark"] .search-highlight { background: #854d0e; color: #fff; }
 
+/* LIVE INDICATOR */
+.live-badge { display:flex; align-items:center; gap:5px; font-size:0.75rem; font-weight:700; color:var(--green); white-space:nowrap; }
+.live-dot { width:8px; height:8px; border-radius:50%; background:var(--green); animation:pulse-dot 1.5s ease-in-out infinite; }
+@keyframes pulse-dot { 0%,100%{opacity:1;transform:scale(1)} 50%{opacity:0.4;transform:scale(0.8)} }
+.live-badge.stale { color:var(--text-muted); }
+.live-badge.stale .live-dot { background:var(--text-muted); animation:none; }
+.status-chip.live-chip { background:#fee2e2; color:#991b1b; font-weight:800; }
+[data-theme="dark"] .status-chip.live-chip { background:#7f1d1d; color:#fca5a5; }
+
 /* FOOTER */
 .site-footer { text-align: center; padding: 24px; color: var(--text-muted); font-size: 0.78rem; border-top: 1px solid var(--border); margin-top: 40px; }
 
@@ -303,6 +312,9 @@ body { background: var(--bg); color: var(--text); font-family: -apple-system, Bl
 <div class="search-wrap">
   <input class="search-input" id="globalSearch" type="text" placeholder="Search team, city, venue, group…" oninput="handleSearch(this.value)">
   <span class="search-results-count" id="searchCount"></span>
+  <div class="live-badge stale" id="liveBadge" title="Live data from worldcup26.ir">
+    <span class="live-dot"></span><span id="liveStatus">Loading…</span>
+  </div>
 </div>
 <div class="tabs-wrap">
   <button class="tab-btn active" onclick="switchTab('home',this)">🏠 Home</button>
@@ -396,7 +408,105 @@ function teamAlias(t){
   if(t==='Côte d\'Ivoire') return 'Ivory Coast';
   if(t==='Cabo Verde') return 'Cape Verde';
   if(t==='Congo DR'||t==='DR Congo') return 'DR Congo';
+  if(t==='Czech Republic'||t==='Czechia') return 'Czechia';
+  if(t==='Bosnia Herzegovina'||t==='Bosnia and Herzegovina') return 'Bosnia and Herzegovina';
+  if(t==='Turkey'||t==='Türkiye') return 'Türkiye';
+  if(t==='Ivory Coast'||t==='Côte d\'Ivoire') return 'Ivory Coast';
   return t;
+}
+
+// ============================================================
+// LIVE DATA STATE
+// ============================================================
+const API_BASE = 'http://worldcup26.ir:3050';
+const API_TOKEN = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjZhMzU2ZmMxNWE5YjM0NGQyYjY2YTIzNSIsImlhdCI6MTc4MTg4NjkxNSwiZXhwIjoxNzg5MTQ0NTE1fQ.934rRpSuauWgOoCJivxSQgFcvnVZ73UemlBBBQBHJCk';
+let liveScores = {};    // matchKey → {s1,s2,done,livePhase}
+let liveStandings = {}; // groupLetter → [{t,mp,w,d,l,gf,ga}]
+let lastUpdated = null;
+
+function getTodayPDT(){
+  // PDT = UTC-7
+  const pdt = new Date(Date.now() - 7*3600*1000);
+  return pdt.toISOString().split('T')[0];
+}
+function matchKey(t1,t2,date){
+  return `${teamAlias(t1).toLowerCase()}|${teamAlias(t2).toLowerCase()}|${date}`;
+}
+function getLiveScore(m){
+  return liveScores[matchKey(m.t1,m.t2,m.date)] || null;
+}
+function getEffectiveStandings(grp){
+  return liveStandings[grp] || STANDINGS[grp] || [];
+}
+function updateLiveIndicator(error){
+  const badge = document.getElementById('liveBadge');
+  const status = document.getElementById('liveStatus');
+  if(!badge) return;
+  if(error){
+    badge.className='live-badge stale';
+    status.textContent='Static data';
+  } else if(lastUpdated){
+    badge.className='live-badge';
+    const mins = Math.round((Date.now()-lastUpdated)/60000);
+    status.textContent = mins<1?'Live · just now':`Live · ${mins}m ago`;
+  }
+}
+async function fetchLiveData(){
+  const H = {'Authorization':`Bearer ${API_TOKEN}`};
+  try {
+    const [gRes,grRes,tRes] = await Promise.all([
+      fetch(`${API_BASE}/get/games`,{headers:H}),
+      fetch(`${API_BASE}/get/groups`,{headers:H}),
+      fetch(`${API_BASE}/get/teams`,{headers:H})
+    ]);
+    if(!gRes.ok||!grRes.ok||!tRes.ok) throw new Error('API error');
+    const [{games},{groups},{teams}] = await Promise.all([gRes.json(),grRes.json(),tRes.json()]);
+
+    // Build live scores map
+    const newScores = {};
+    games.forEach(g=>{
+      const [datePart] = (g.local_date||'').split(' ');
+      const [mo,da,yr] = (datePart||'').split('/');
+      if(!yr) return;
+      const isoDate = `${yr}-${mo.padStart(2,'0')}-${da.padStart(2,'0')}`;
+      const key = matchKey(g.home_team_name_en||'', g.away_team_name_en||'', isoDate);
+      newScores[key] = {
+        s1: parseInt(g.home_score)||0,
+        s2: parseInt(g.away_score)||0,
+        done: g.finished==='TRUE',
+        livePhase: g.time_elapsed||''
+      };
+    });
+    liveScores = newScores;
+
+    // Build live standings map
+    const teamMap = {};
+    teams.forEach(t=>{ teamMap[t.id] = teamAlias(t.name_en); });
+    const newStandings = {};
+    groups.forEach(g=>{
+      newStandings[g.name] = g.teams.map(t=>({
+        t: teamMap[t.team_id]||t.team_id,
+        mp: parseInt(t.mp)||0,
+        w: parseInt(t.w)||0,
+        d: parseInt(t.d)||0,
+        l: parseInt(t.l)||0,
+        gf: parseInt(t.gf)||0,
+        ga: parseInt(t.ga)||0
+      }));
+    });
+    liveStandings = newStandings;
+    lastUpdated = Date.now();
+    updateLiveIndicator();
+
+    // Re-render with fresh data
+    renderFavorites();
+    renderGroups();
+    renderSchedule();
+    renderBracket();
+  } catch(e){
+    console.warn('Live data unavailable, using static fallback:', e);
+    updateLiveIndicator(true);
+  }
 }
 
 // All 12 groups standings (from Fox Sports live, June 18 2026)
@@ -640,7 +750,10 @@ function gd(t){return t.gf-t.ga;}
 
 function getStandingForTeam(name){
   const alias = teamAlias(name);
-  for(const [grp, teams] of Object.entries(STANDINGS)){
+  // Check all group letters (live overrides static)
+  const allGroups = {...STANDINGS};
+  Object.keys(liveStandings).forEach(k=>{ allGroups[k]=liveStandings[k]; });
+  for(const [grp, teams] of Object.entries(allGroups)){
     const sorted = [...teams].sort((a,b)=>pts(b)-pts(a)||gd(b)-gd(a)||b.gf-a.gf);
     const idx = sorted.findIndex(t=>teamAlias(t.t)===alias||t.t===name);
     if(idx>=0) return {rank:idx+1, group:`Group ${grp}`, team:sorted[idx]};
@@ -650,16 +763,23 @@ function getStandingForTeam(name){
 
 function getNextGame(name){
   const alias = teamAlias(name);
-  const today = '2026-06-18';
-  return MATCHES.find(m=>
-    !m.done &&
-    (teamAlias(m.t1)===alias||teamAlias(m.t2)===alias||m.t1===name||m.t2===name) &&
-    m.date >= today
-  );
+  const today = getTodayPDT();
+  return MATCHES.find(m=>{
+    const live = getLiveScore(m);
+    const isDone = live ? live.done : m.done;
+    return !isDone &&
+      (teamAlias(m.t1)===alias||teamAlias(m.t2)===alias||m.t1===name||m.t2===name) &&
+      m.date >= today;
+  });
 }
 
-function statusChip(m, today='2026-06-18'){
-  if(m.done) return `<span class="status-chip ft">Full Time</span>`;
+function statusChip(m, today){
+  today = today || getTodayPDT();
+  const live = getLiveScore(m);
+  const isDone = live ? live.done : m.done;
+  const livePhase = live?.livePhase||'';
+  if(isDone) return `<span class="status-chip ft">Full Time</span>`;
+  if(livePhase && livePhase!=='finished' && livePhase!=='') return `<span class="status-chip live-chip">🔴 ${livePhase}</span>`;
   if(m.date===today) return `<span class="status-chip today-chip">Today</span>`;
   return `<span class="status-chip upcoming">${m.day.split(',')[0]}</span>`;
 }
@@ -722,7 +842,10 @@ function renderFavorites(){
 // ============================================================
 function renderGroups(){
   const grid = document.getElementById('groupsGrid');
-  grid.innerHTML = Object.entries(STANDINGS).map(([grp, teams])=>{
+  // Use live standings if available, fall back to static
+  const standingsToUse = {};
+  Object.keys(STANDINGS).forEach(k=>{ standingsToUse[k] = getEffectiveStandings(k); });
+  grid.innerHTML = Object.entries(standingsToUse).map(([grp, teams])=>{
     const sorted = [...teams].sort((a,b)=>pts(b)-pts(a)||gd(b)-gd(a)||b.gf-a.gf);
     const rows = sorted.map((t,i)=>{
       const p=pts(t), g=gd(t);
@@ -764,10 +887,13 @@ function parseTime(t){
   return h*60+(m||0);
 }
 function renderSchedule(){
-  const today = '2026-06-18';
-  const yesterday = '2026-06-17';
+  const today = getTodayPDT();
+  // yesterday
+  const yd = new Date(today+'T12:00:00Z'); yd.setDate(yd.getDate()-1);
+  const yesterday = yd.toISOString().split('T')[0];
   // Show yesterday + today + next 2 days (3 days total going forward)
-  const dayLimit = '2026-06-20';
+  const dl = new Date(today+'T12:00:00Z'); dl.setDate(dl.getDate()+2);
+  const dayLimit = dl.toISOString().split('T')[0];
 
   const relevant = MATCHES.filter(m=>m.date>=yesterday && m.date<=dayLimit);
   const byDay = {};
@@ -795,7 +921,10 @@ function renderSchedule(){
 
 function getTeamPts(name){
   const alias = teamAlias(name);
-  for(const teams of Object.values(STANDINGS)){
+  // Prefer live standings
+  const allGroups = {...STANDINGS};
+  Object.keys(liveStandings).forEach(k=>{ allGroups[k]=liveStandings[k]; });
+  for(const teams of Object.values(allGroups)){
     const t = teams.find(t=>teamAlias(t.t)===alias||t.t===name);
     if(t) return pts(t);
   }
@@ -821,11 +950,17 @@ function renderMatchCard(m, today='2026-06-18'){
       ${p2!==null?`<span class="mc-pts">${p2} pts</span>`:''}
     </div>`;
 
-  const midHTML = m.done && m.s1!==undefined
+  const live = getLiveScore(m);
+  const s1 = live ? live.s1 : m.s1;
+  const s2 = live ? live.s2 : m.s2;
+  const isDone = live ? live.done : m.done;
+  const isLive = live && !live.done && live.livePhase && live.livePhase!=='finished';
+
+  const midHTML = (isDone || isLive) && s1!==undefined
     ? `<div class="mc-score-box">
-        <span class="mc-score${m.s1>m.s2?' winner':''}">${m.s1}</span>
-        <span class="mc-sep">–</span>
-        <span class="mc-score${m.s2>m.s1?' winner':''}">${m.s2}</span>
+        <span class="mc-score${s1>s2?' winner':''}">${s1}</span>
+        <span class="mc-sep">${isLive?'<span style="font-size:0.6rem;color:#dc2626">🔴</span>':'–'}</span>
+        <span class="mc-score${s2>s1?' winner':''}">${s2}</span>
        </div>`
     : `<div class="mc-score-box"><span class="mc-vs">VS</span></div>`;
 
@@ -871,7 +1006,8 @@ function renderBracket(){
 
   // Group Stage summary
   html += `<div class="bracket-stage"><span class="bracket-stage-title">Group Stage — Final Standings</span><div class="bracket-grid">`;
-  Object.entries(STANDINGS).forEach(([grp,teams])=>{
+  Object.entries(STANDINGS).forEach(([grp,])=>{
+    const teams = getEffectiveStandings(grp);
     const sorted = [...teams].sort((a,b)=>pts(b)-pts(a)||gd(b)-gd(a)||b.gf-a.gf);
     html += `<div class="bracket-match"><div style="padding:6px 12px;background:var(--group-header);color:var(--group-header-text);font-size:0.75rem;font-weight:800;letter-spacing:1px">GROUP ${grp}</div>`;
     sorted.forEach((t,i)=>{
@@ -1091,12 +1227,22 @@ function toggleTheme(){
   const saved = localStorage.getItem('wc26theme')||'light';
   document.documentElement.setAttribute('data-theme', saved);
   document.getElementById('themeBtn').textContent = saved==='dark'?'☀️ Light':'🌙 Dark';
+  // Render with static data first (instant)
   renderFavorites();
   renderGroups();
   renderSchedule();
   renderBracket();
   renderRankings('overall');
   renderBaseCamps('all');
+  // Then fetch live data and re-render (overlays live scores/standings)
+  fetchLiveData();
+  // Auto-refresh every 60 seconds
+  setInterval(()=>{
+    fetchLiveData();
+    updateLiveIndicator();
+  }, 60000);
+  // Update "X mins ago" badge every minute
+  setInterval(updateLiveIndicator, 60000);
 })();
 </script>
 </body>
