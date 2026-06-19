@@ -283,11 +283,46 @@ body { background: var(--bg); color: var(--text); font-family: -apple-system, Bl
 .site-footer { text-align: center; padding: 24px; color: var(--text-muted); font-size: 0.78rem; border-top: 1px solid var(--border); margin-top: 40px; }
 
 /* RESPONSIVE */
+/* POWER RANKINGS CARDS */
+.pr-cards-row { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 20px; margin-bottom: 28px; }
+.pr-player-card { border-radius: 16px; overflow: hidden; box-shadow: 0 4px 20px rgba(0,0,0,0.25); }
+.pr-card-inner { display: flex; min-height: 195px; background: linear-gradient(135deg, #1a6b2e 0%, #0f4d20 60%, #0a3015 100%); }
+.pr-card-info { flex: 1; padding: 18px 16px 16px; color: #fff; display: flex; flex-direction: column; justify-content: space-between; }
+.pr-card-cat { font-size: 0.68rem; font-weight: 800; letter-spacing: 2px; text-transform: uppercase; color: rgba(255,255,255,0.65); margin-bottom: 8px; }
+.pr-card-country { font-size: 0.8rem; color: rgba(255,255,255,0.85); margin-bottom: 2px; display: flex; align-items: center; gap: 6px; }
+.pr-card-rank-num { font-size: 0.78rem; font-weight: 700; background: rgba(255,255,255,0.2); padding: 2px 8px; border-radius: 10px; display: inline-block; margin-bottom: 6px; color: rgba(255,255,255,0.9); }
+.pr-card-name { font-size: 1.1rem; font-weight: 900; color: #fff; line-height: 1.2; margin-bottom: 12px; }
+.pr-card-score-num { font-size: 2.4rem; font-weight: 900; color: #fff; line-height: 1; }
+.pr-card-score-label { font-size: 0.7rem; color: rgba(255,255,255,0.65); font-weight: 600; letter-spacing: 0.5px; display: block; margin-top: 2px; }
+.pr-card-photo-wrap { width: 130px; flex-shrink: 0; position: relative; overflow: hidden; }
+.pr-card-photo { width: 100%; height: 100%; object-fit: cover; object-position: top center; }
+.pr-card-photo-fallback { width: 100%; height: 100%; display: flex; align-items: center; justify-content: center; font-size: 4rem; background: rgba(0,0,0,0.15); }
+.pr-card-footer { background: rgba(0,0,0,0.25); padding: 8px 16px; font-size: 0.7rem; color: rgba(255,255,255,0.75); display: flex; justify-content: space-between; align-items: center; letter-spacing: 0.3px; }
+.pr-section-title { font-size: 0.78rem; font-weight: 800; letter-spacing: 1.5px; text-transform: uppercase; color: var(--text-muted); margin: 24px 0 12px; padding-bottom: 8px; border-bottom: 1px solid var(--border); }
+
+/* MINI GROUP STANDINGS (Home tab) */
+.mini-standings-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(270px, 1fr)); gap: 16px; margin-bottom: 32px; }
+.mini-group-card { background: var(--card); border: 1px solid var(--border); border-radius: 12px; overflow: hidden; box-shadow: var(--shadow); }
+.mini-group-header { background: var(--group-header); color: var(--group-header-text); padding: 8px 14px; font-weight: 800; font-size: 0.8rem; letter-spacing: 1px; text-transform: uppercase; }
+.mini-table { width: 100%; border-collapse: collapse; font-size: 0.8rem; }
+.mini-table th { background: var(--bg); color: var(--text-muted); font-size: 0.65rem; text-transform: uppercase; letter-spacing: 0.5px; padding: 5px 10px; text-align: right; font-weight: 600; }
+.mini-table th:nth-child(-n+2) { text-align: left; }
+.mini-table td { padding: 7px 10px; text-align: right; border-bottom: 1px solid var(--border); }
+.mini-table td:first-child { text-align: center; font-weight: 700; color: var(--text-muted); width: 24px; font-size: 0.75rem; }
+.mini-table td:nth-child(2) { text-align: left; }
+.mini-table tr:last-child td { border-bottom: none; }
+.mini-table tr.mini-adv { background: var(--rank1); }
+.mini-table tr.mini-adv2 { background: var(--rank2); }
+.mini-team-cell { display: flex; align-items: center; gap: 5px; font-weight: 600; }
+.mini-team-cell.fav .name { color: var(--accent); font-weight: 800; }
+.mini-pts { font-weight: 900; color: var(--accent); }
+
 @media (max-width: 600px) {
   .site-header { padding: 24px 16px 18px; }
   .tab-panel { padding: 16px; }
   .pr-header, .pr-row { grid-template-columns: 40px 1fr repeat(2,70px); }
   .pr-header span:last-child, .pr-row .pr-score:last-child { display: none; }
+  .pr-card-photo-wrap { width: 100px; }
 }
 </style>
 </head>
@@ -318,6 +353,7 @@ body { background: var(--bg); color: var(--text); font-family: -apple-system, Bl
 </div>
 <div class="tabs-wrap">
   <button class="tab-btn active" onclick="switchTab('home',this)">🏠 Home</button>
+  <button class="tab-btn" onclick="switchTab('schedule',this)">📅 Schedule</button>
   <button class="tab-btn" onclick="switchTab('standings',this)">📊 Standings</button>
   <button class="tab-btn" onclick="switchTab('bracket',this)">🏆 Bracket</button>
   <button class="tab-btn" onclick="switchTab('rankings',this)">⚡ Power Rankings</button>
@@ -330,8 +366,17 @@ body { background: var(--bg); color: var(--text); font-family: -apple-system, Bl
   <div class="section-title">⭐ <span class="highlight">My Favorites</span> — Current Standing &amp; Next Game</div>
   <div class="favorites-grid" id="favoritesGrid"></div>
 
-  <div class="section-title">📅 Schedule — Yesterday Through Next Week</div>
+  <div class="section-title">📊 <span class="highlight">Group Standings</span> — My Favorites' Groups</div>
+  <div class="mini-standings-grid" id="favGroupStandingsGrid"></div>
+
+  <div class="section-title">📅 Schedule — Today &amp; Tomorrow</div>
   <div id="homeScheduleContent"></div>
+</div>
+
+<!-- ===== SCHEDULE TAB ===== -->
+<div class="tab-panel" id="tab-schedule">
+  <div class="section-title">📅 <span class="highlight">Upcoming Matches</span> — Next 4 Days</div>
+  <div id="fullScheduleContent"></div>
 </div>
 
 <!-- ===== STANDINGS TAB ===== -->
@@ -349,12 +394,7 @@ body { background: var(--bg); color: var(--text); font-family: -apple-system, Bl
 <!-- ===== POWER RANKINGS TAB ===== -->
 <div class="tab-panel" id="tab-rankings">
   <div class="pr-note">
-    <strong>FIFA Power Rankings powered by Aramco</strong> — Individual player rankings based on match data collected during the 2026 World Cup. Players scored 0–10 on Attacking, Creativity, and Defending. Updated after every match. <em>Source: fifa.com</em>
-  </div>
-  <div class="pr-cat-tabs">
-    <button class="pr-cat-btn active" onclick="switchPRCat('overall',this)">Overall (Attacking)</button>
-    <button class="pr-cat-btn" onclick="switchPRCat('creativity',this)">Creativity</button>
-    <button class="pr-cat-btn" onclick="switchPRCat('defending',this)">Defending</button>
+    <strong>FIFA Power Rankings powered by Aramco</strong> — Top performers by category, based on match data from the 2026 World Cup. Scored 0–10 per match. <em>Source: <a href="https://www.fifa.com/en/tournaments/mens/worldcup/canadamexicousa2026/power-rankings" target="_blank" style="color:var(--accent)">FIFA.com</a></em>
   </div>
   <div id="rankingsContent"></div>
 </div>
@@ -500,8 +540,10 @@ async function fetchLiveData(){
 
     // Re-render with fresh data
     renderFavorites();
+    renderFavGroupStandings();
     renderGroups();
     renderSchedule();
+    renderFullSchedule();
     renderBracket();
   } catch(e){
     console.warn('Live data unavailable, using static fallback:', e);
@@ -886,37 +928,96 @@ function parseTime(t){
   if(ampm==='AM'&&h===12) h=0;
   return h*60+(m||0);
 }
-function renderSchedule(){
-  const today = getTodayPDT();
-  // yesterday
-  const yd = new Date(today+'T12:00:00Z'); yd.setDate(yd.getDate()-1);
-  const yesterday = yd.toISOString().split('T')[0];
-  // Show yesterday + today + next 2 days (3 days total going forward)
-  const dl = new Date(today+'T12:00:00Z'); dl.setDate(dl.getDate()+2);
-  const dayLimit = dl.toISOString().split('T')[0];
+function buildDayBadge(d, today, tomorrow){
+  if(d===today) return `<span class="day-badge today">Today</span>`;
+  if(d===tomorrow) return `<span class="day-badge tomorrow">Tomorrow</span>`;
+  return '';
+}
 
-  const relevant = MATCHES.filter(m=>m.date>=yesterday && m.date<=dayLimit);
+function renderDaySections(matches, today, tomorrow){
   const byDay = {};
-  relevant.forEach(m=>{
+  matches.forEach(m=>{
     if(!byDay[m.date]) byDay[m.date]={day:m.day,matches:[]};
     byDay[m.date].matches.push(m);
   });
-
-  const html = Object.entries(byDay).sort(([a],[b])=>a.localeCompare(b)).map(([d,{day,matches}])=>{
-    let badge='', badgeClass='';
-    if(d===today){badge='Today';badgeClass='today';}
-    else if(d===yesterday){badge='Yesterday';badgeClass='yesterday';}
-    else if(d==='2026-06-19'){badge='Tomorrow';badgeClass='tomorrow';}
-
-    const cards = [...matches].sort((a,b)=>parseTime(a.time)-parseTime(b.time)).map(m=>renderMatchCard(m,today)).join('');
+  return Object.entries(byDay).sort(([a],[b])=>a.localeCompare(b)).map(([d,{day,matches:dayMatches}])=>{
+    const badge = buildDayBadge(d, today, tomorrow);
+    const cards = [...dayMatches].sort((a,b)=>parseTime(a.time)-parseTime(b.time)).map(m=>renderMatchCard(m,today)).join('');
     return `
     <div class="day-section">
-      <div class="day-header">${day}${badge?` <span class="day-badge ${badgeClass}">${badge}</span>`:''}</div>
+      <div class="day-header">${day}${badge?` ${badge}`:''}</div>
       <div class="matches-grid">${cards}</div>
     </div>`;
   }).join('');
+}
 
-  document.getElementById('homeScheduleContent').innerHTML = html;
+function renderSchedule(){
+  const today = getTodayPDT();
+  const tmObj = new Date(today+'T12:00:00Z'); tmObj.setDate(tmObj.getDate()+1);
+  const tomorrow = tmObj.toISOString().split('T')[0];
+  // Home: today + tomorrow only
+  const relevant = MATCHES.filter(m=>m.date>=today && m.date<=tomorrow && m.group);
+  const html = renderDaySections(relevant, today, tomorrow);
+  document.getElementById('homeScheduleContent').innerHTML = html ||
+    `<p style="color:var(--text-muted);padding:12px 0">No group stage matches today or tomorrow.</p>`;
+}
+
+function renderFullSchedule(){
+  const today = getTodayPDT();
+  const tmObj = new Date(today+'T12:00:00Z'); tmObj.setDate(tmObj.getDate()+1);
+  const tomorrow = tmObj.toISOString().split('T')[0];
+  const endObj = new Date(today+'T12:00:00Z'); endObj.setDate(endObj.getDate()+3);
+  const dayLimit = endObj.toISOString().split('T')[0];
+  // Schedule tab: next 4 days (today through today+3)
+  const relevant = MATCHES.filter(m=>m.date>=today && m.date<=dayLimit);
+  const html = renderDaySections(relevant, today, tomorrow);
+  document.getElementById('fullScheduleContent').innerHTML = html ||
+    `<p style="color:var(--text-muted);padding:12px 0">No upcoming matches in the next 4 days.</p>`;
+}
+
+// ============================================================
+// RENDER FAV GROUP STANDINGS (Home tab mini tables)
+// ============================================================
+function renderFavGroupStandings(){
+  // Groups A (South Korea), C (Haiti), D (USA)
+  const favGroups = [
+    {grp:'A', favTeam:'South Korea'},
+    {grp:'C', favTeam:'Haiti'},
+    {grp:'D', favTeam:'United States'}
+  ];
+  const grid = document.getElementById('favGroupStandingsGrid');
+  grid.innerHTML = favGroups.map(({grp, favTeam})=>{
+    const teams = getEffectiveStandings(grp);
+    const sorted = [...teams].sort((a,b)=>pts(b)-pts(a)||gd(b)-gd(a)||b.gf-a.gf);
+    const rows = sorted.map((t,i)=>{
+      const p=pts(t), g=gd(t);
+      const isFavTeam = teamAlias(t.t)===favTeam || t.t===favTeam;
+      const rowClass = i<2?'mini-adv':(i===2&&sorted.length>3?'mini-adv2':'');
+      return `<tr class="${rowClass}">
+        <td>${i+1}</td>
+        <td><div class="mini-team-cell ${isFavTeam?'fav':''}">
+          <span>${flag(t.t)}</span>
+          <span class="name">${t.t}</span>
+          ${isFavTeam?'⭐':''}
+        </div></td>
+        <td>${t.mp}</td>
+        <td>${t.w}</td>
+        <td>${t.d}</td>
+        <td>${t.l}</td>
+        <td class="${g>0?'gd-pos':g<0?'gd-neg':''}">${g>0?'+':''}${g}</td>
+        <td class="mini-pts">${p}</td>
+      </tr>`;
+    }).join('');
+    return `
+    <div class="mini-group-card">
+      <div class="mini-group-header">Group ${grp} — ${flag(favTeam)} ${favTeam}</div>
+      <table class="mini-table">
+        <thead><tr><th>#</th><th>Team</th><th>MP</th><th>W</th><th>D</th><th>L</th><th>GD</th><th>PTS</th></tr></thead>
+        <tbody>${rows}</tbody>
+      </table>
+      <div class="advance-note">🟨 Top 2 advance · ⬜ Best 3rd may advance</div>
+    </div>`;
+  }).join('');
 }
 
 function getTeamPts(name){
@@ -1065,65 +1166,94 @@ function renderBracket(){
 }
 
 // ============================================================
-// RENDER POWER RANKINGS
+// RENDER POWER RANKINGS (visual cards)
 // ============================================================
-let currentPRCat = 'overall';
-function renderRankings(cat='overall'){
-  const data = POWER_RANKINGS[cat]||POWER_RANKINGS.overall;
-  const scoreProp = cat==='creativity'?'cre':cat==='defending'?'def':'atk';
-  const maxScore = Math.max(...data.map(p=>p[scoreProp]));
+const PR_PLAYER_PHOTOS = {
+  'Lionel MESSI': 'https://upload.wikimedia.org/wikipedia/commons/thumb/6/6b/Lionel_Messi_White_House_2026_%283x4_cropped%29.jpg/500px-Lionel_Messi_White_House_2026_%283x4_cropped%29.jpg',
+  'Ramin REZAEIAN': 'https://upload.wikimedia.org/wikipedia/commons/5/55/Ramin_Rezaeian_in_Sepahan.jpg',
+  'Derek CORNELIUS': 'https://upload.wikimedia.org/wikipedia/commons/thumb/6/6b/Cornelius_asse_om_2425.png/500px-Cornelius_asse_om_2425.png'
+};
 
-  const rows = data.map(p=>{
-    const score = p[scoreProp];
-    const pctWidth = Math.round((score/10)*100);
+function renderRankings(){
+  const topPlayers = [
+    { cat: 'Attacking', icon: '⚔️', player: POWER_RANKINGS.overall[0], scoreKey: 'atk', scoreLabel: 'Attacking score' },
+    { cat: 'Creativity', icon: '🎨', player: POWER_RANKINGS.creativity[0], scoreKey: 'cre', scoreLabel: 'Creativity score' },
+    { cat: 'Defending', icon: '🛡️', player: POWER_RANKINGS.defending[0], scoreKey: 'def', scoreLabel: 'Defending score' }
+  ];
+
+  const cards = topPlayers.map(({cat, icon, player, scoreKey, scoreLabel})=>{
+    const photoUrl = PR_PLAYER_PHOTOS[player.name];
+    const photoHtml = photoUrl
+      ? `<img class="pr-card-photo" src="${photoUrl}" alt="${player.name}" onerror="this.parentElement.innerHTML='<div class=\\'pr-card-photo-fallback\\'>${player.flag}</div>'">`
+      : `<div class="pr-card-photo-fallback">${player.flag}</div>`;
+    const isFavPlayer = player.country==='USA'||player.country==='Korea Republic'||player.country==='Haiti';
+
+    return `
+    <div class="pr-player-card">
+      <div class="pr-card-inner">
+        <div class="pr-card-info">
+          <div>
+            <div class="pr-card-cat">${icon} ${cat}</div>
+            <span class="pr-card-rank-num">🥇 1st Place</span>
+            <div class="pr-card-country">${player.flag} ${player.country}</div>
+            <div class="pr-card-name">${player.name}${isFavPlayer?' ⭐':''}</div>
+          </div>
+          <div>
+            <span class="pr-card-score-num">${player[scoreKey].toFixed(2)}</span>
+            <span class="pr-card-score-label">${scoreLabel}</span>
+          </div>
+        </div>
+        <div class="pr-card-photo-wrap">${photoHtml}</div>
+      </div>
+      <div class="pr-card-footer">
+        <span>ATK ${player.atk.toFixed(2)}</span>
+        <span>CRE ${player.cre.toFixed(2)}</span>
+        <span>DEF ${player.def.toFixed(2)}</span>
+      </div>
+    </div>`;
+  }).join('');
+
+  // Also render a compact top-10 table below the cards
+  const tableRows = POWER_RANKINGS.overall.map(p=>{
     const fav = p.country==='USA'||p.country==='Korea Republic'||p.country==='Haiti';
-    const rankClass = p.rank<=3?'top3':'';
     const changeIcon = p.change>0?`<span style="color:var(--green);font-size:0.65rem">▲${p.change}</span>`:
                        p.change<0?`<span style="color:var(--red);font-size:0.65rem">▼${Math.abs(p.change)}</span>`:
                        `<span style="color:var(--text-muted);font-size:0.65rem">—</span>`;
     return `
     <div class="pr-row${fav?' fav':''}">
-      <div class="pr-rank ${rankClass}">${p.rank}</div>
+      <div class="pr-rank ${p.rank<=3?'top3':''}">${p.rank}</div>
       <div class="pr-player">
         <span style="font-size:1.3rem">${p.flag}</span>
         <div>
-          <div class="pr-player-name">${p.name} ${fav?'⭐':''}</div>
+          <div class="pr-player-name">${p.name}${fav?' ⭐':''}</div>
           <div class="pr-player-country">${p.country} ${p.change!==undefined?changeIcon:''}</div>
         </div>
       </div>
-      <div class="pr-score${p.rank===1?' best':''}">
-        ${p.atk.toFixed(2)}
+      <div class="pr-score${p.rank===1?' best':''}">${p.atk.toFixed(2)}
         <div class="score-bar"><div class="score-bar-fill" style="width:${Math.round((p.atk/10)*100)}%"></div></div>
       </div>
-      <div class="pr-score${cat==='creativity'&&p.rank===1?' best':''}">
-        ${p.cre.toFixed(2)}
+      <div class="pr-score">${p.cre.toFixed(2)}
         <div class="score-bar"><div class="score-bar-fill" style="width:${Math.round((p.cre/10)*100)}%"></div></div>
       </div>
-      <div class="pr-score${cat==='defending'&&p.rank===1?' best':''}">
-        ${p.def.toFixed(2)}
+      <div class="pr-score">${p.def.toFixed(2)}
         <div class="score-bar"><div class="score-bar-fill" style="width:${Math.round((p.def/10)*100)}%"></div></div>
       </div>
     </div>`;
   }).join('');
 
   document.getElementById('rankingsContent').innerHTML = `
+    <div class="pr-cards-row">${cards}</div>
+    <div class="pr-section-title">Top 10 Overall Rankings</div>
     <div class="pr-header">
       <span>Rank</span><span>Player</span>
       <span style="text-align:right">Attacking</span>
       <span style="text-align:right">Creativity</span>
       <span style="text-align:right">Defending</span>
     </div>
-    ${rows}
+    ${tableRows}
     <div style="margin-top:16px;font-size:0.75rem;color:var(--text-muted);text-align:center">
       Scores 0–10 · Updated after every match · Source: <a href="https://www.fifa.com/en/tournaments/mens/worldcup/canadamexicousa2026/power-rankings" target="_blank" style="color:var(--accent)">FIFA.com</a>
     </div>`;
-}
-
-function switchPRCat(cat, btn){
-  currentPRCat = cat;
-  document.querySelectorAll('.pr-cat-btn').forEach(b=>b.classList.remove('active'));
-  btn.classList.add('active');
-  renderRankings(cat);
 }
 
 // ============================================================
@@ -1229,10 +1359,12 @@ function toggleTheme(){
   document.getElementById('themeBtn').textContent = saved==='dark'?'☀️ Light':'🌙 Dark';
   // Render with static data first (instant)
   renderFavorites();
+  renderFavGroupStandings();
   renderGroups();
   renderSchedule();
+  renderFullSchedule();
   renderBracket();
-  renderRankings('overall');
+  renderRankings();
   renderBaseCamps('all');
   // Then fetch live data and re-render (overlays live scores/standings)
   fetchLiveData();
