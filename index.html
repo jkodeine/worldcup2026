@@ -129,6 +129,7 @@ body { background: var(--bg); color: var(--text); font-family: -apple-system, Bl
 .fav-next-matchup { font-size: 0.95rem; font-weight: 700; color: var(--text); margin-bottom: 4px; }
 .fav-next-details { font-size: 0.78rem; color: var(--text-muted); line-height: 1.6; }
 .fav-next-details span { display: inline-block; margin-right: 10px; }
+.fav-story { font-size: 0.8rem; color: var(--text-muted); line-height: 1.55; margin-top: 10px; padding: 10px 12px; background: var(--card); border: 1px solid var(--border); border-radius: 10px; }
 .fav-stat-row { display: flex; gap: 8px; margin-top: 10px; flex-wrap: wrap; }
 .fav-stat { background: var(--badge-blue); color: var(--badge-blue-text); border-radius: 6px; padding: 3px 9px; font-size: 0.75rem; font-weight: 600; }
 
@@ -829,6 +830,31 @@ function statusChip(m, today){
 // ============================================================
 // RENDER FAVORITES
 // ============================================================
+function getTeamStoryBlurb(name, rank, teamPts, gp, oppName) {
+  const opp = oppName || 'their next opponent';
+  if (name === 'South Korea') {
+    if (teamPts >= 6) return "South Korea have clinched their spot in the Round of 16 — a continuation of their remarkable knockout tradition stretching back to their legendary 4th-place run on home soil in 2002. 🏆";
+    if (teamPts >= 3 && rank <= 2) return `Sitting 2nd with ${teamPts} pts, South Korea are in control of their destiny. A strong result against ${opp} seals the deal — the Taeguk Warriors have reached the knockouts in back-to-back World Cups and know exactly how to handle this moment.`;
+    if (teamPts >= 3) return `South Korea have ${teamPts} pts but need a strong result to secure advancement. With Son Heung-min leading the line, they have the quality — this team has never been one to write off in a must-win situation.`;
+    if (gp === 0) return "South Korea are one of Asia's most decorated World Cup nations, with a legendary 4th-place finish on home soil in 2002. Their technical, high-energy style makes every match a must-watch.";
+    return `South Korea need a result against ${opp} to stay alive — and this team thrives under pressure. Their never-say-die mentality has produced some of the tournament's most memorable moments over the years.`;
+  }
+  if (name === 'United States') {
+    if (teamPts >= 6) return "The USMNT are through to the knockouts, lighting up home crowds at every venue. This young, European-based squad is delivering the tournament America has been dreaming of. 🇺🇸";
+    if (oppName === 'Australia') return "The USA top Group D after a commanding 4-1 win over Paraguay. Next up: Australia — the Socceroos are no pushovers (they made the Round of 16 in 2022 and beat Turkey 2-0 in their opener), but with home-field advantage and incredible momentum, the USMNT are strong favorites to take all 3 points.";
+    if (teamPts >= 3 && rank <= 2) return `The USMNT are in the top 2 of Group D with ${teamPts} pts and on track for the knockouts. Playing on home soil in sold-out stadiums, this team — built around Pulisic, Weah, and a wave of European-based stars — is genuinely dangerous.`;
+    if (teamPts >= 3) return `The US have ${teamPts} pts and are still very much in the fight. Home-field advantage and a passionate crowd make every game at this World Cup feel electric for this young American squad.`;
+    return `The USMNT need a big result against ${opp} to keep their knockout dreams alive — and the entire nation will be watching. Christian Pulisic and this resilient squad have shown they can rise to any occasion.`;
+  }
+  if (name === 'Haiti') {
+    if (teamPts >= 4) return "Haiti are one of the tournament's great stories — this Caribbean nation is showing the world exactly what fearless football looks like. Every goal, every point is history in the making. 🇭🇹";
+    if (teamPts >= 1) return `Haiti have earned points on the world's biggest stage — a remarkable achievement for one of CONCACAF's most passionate football nations. Their journey to 2026 was already an inspiring one, and they're giving absolutely everything out there.`;
+    if (oppName === 'Brazil') return "The road is steep with Brazil up next, but Haiti's qualification for 2026 was already a historic milestone for Caribbean football. Playing the tournament favorites with zero pressure is a gift — expect them to be fearless, expressive, and fully backed by their passionate diaspora in the stands.";
+    return `Haiti are the underdogs, but their World Cup story is one of pure inspiration. Qualifying for 2026 was a landmark moment for Caribbean football, and every minute on this stage is history — their nation is watching with enormous pride.`;
+  }
+  return null;
+}
+
 function renderFavorites(){
   const favs = [
     {name:'South Korea', dbName:'Korea Republic'},
@@ -844,6 +870,7 @@ function renderFavorites(){
     const oppFlag = next?flag(oppName):'';
     const teamPts = st?pts(st.team):0;
     const teamGD = st?gd(st.team):0;
+    const storyBlurb = getTeamStoryBlurb(f.name, st?st.rank:4, teamPts, st?st.team.mp:0, oppName!=='—'?oppName:null);
     return `
     <div class="fav-card">
       <div class="fav-card-header">
@@ -875,6 +902,7 @@ function renderFavorites(){
           </div>
         `:`<div class="fav-next-matchup" style="color:var(--text-muted)">No upcoming games found</div>`}
       </div>
+      ${storyBlurb?`<div class="fav-story">💬 ${storyBlurb}</div>`:''}
     </div>`;
   }).join('');
 }
