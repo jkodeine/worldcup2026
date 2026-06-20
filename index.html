@@ -547,10 +547,10 @@ async function fetchLiveData(){
 
 // All 12 groups standings (from Fox Sports live, June 18 2026)
 const STANDINGS = {
-  A:[{t:'Mexico',mp:1,w:1,d:0,l:0,gf:2,ga:0},{t:'South Korea',mp:1,w:1,d:0,l:0,gf:2,ga:1},{t:'Czechia',mp:2,w:0,d:1,l:1,gf:2,ga:3},{t:'South Africa',mp:2,w:0,d:1,l:1,gf:1,ga:3}],
-  B:[{t:'Switzerland',mp:2,w:0,d:2,l:0,gf:1,ga:1},{t:'Bosnia and Herzegovina',mp:2,w:0,d:2,l:0,gf:1,ga:1},{t:'Canada',mp:1,w:0,d:1,l:0,gf:1,ga:1},{t:'Qatar',mp:1,w:0,d:1,l:0,gf:1,ga:1}],
-  C:[{t:'Scotland',mp:1,w:1,d:0,l:0,gf:1,ga:0},{t:'Morocco',mp:1,w:0,d:1,l:0,gf:1,ga:1},{t:'Brazil',mp:1,w:0,d:1,l:0,gf:1,ga:1},{t:'Haiti',mp:1,w:0,d:0,l:1,gf:0,ga:1}],
-  D:[{t:'United States',mp:1,w:1,d:0,l:0,gf:4,ga:1},{t:'Australia',mp:1,w:1,d:0,l:0,gf:2,ga:0},{t:'Türkiye',mp:1,w:0,d:0,l:1,gf:0,ga:2},{t:'Paraguay',mp:1,w:0,d:0,l:1,gf:1,ga:4}],
+  A:[{t:'Mexico',mp:2,w:2,d:0,l:0,gf:4,ga:1},{t:'South Korea',mp:2,w:1,d:0,l:1,gf:3,ga:3},{t:'Czechia',mp:2,w:0,d:1,l:1,gf:2,ga:3},{t:'South Africa',mp:2,w:0,d:1,l:1,gf:1,ga:3}],
+  B:[{t:'Canada',mp:2,w:1,d:1,l:0,gf:7,ga:1},{t:'Switzerland',mp:2,w:1,d:1,l:0,gf:5,ga:2},{t:'Bosnia and Herzegovina',mp:2,w:0,d:1,l:1,gf:2,ga:5},{t:'Qatar',mp:2,w:0,d:1,l:1,gf:1,ga:7}],
+  C:[{t:'Brazil',mp:2,w:1,d:1,l:0,gf:4,ga:1},{t:'Morocco',mp:2,w:1,d:1,l:0,gf:2,ga:1},{t:'Scotland',mp:2,w:1,d:0,l:1,gf:1,ga:1},{t:'Haiti',mp:2,w:0,d:0,l:2,gf:0,ga:4}],
+  D:[{t:'United States',mp:2,w:2,d:0,l:0,gf:6,ga:1},{t:'Australia',mp:2,w:1,d:0,l:1,gf:2,ga:2},{t:'Paraguay',mp:2,w:1,d:0,l:1,gf:2,ga:4},{t:'Türkiye',mp:2,w:0,d:0,l:2,gf:0,ga:3}],
   E:[{t:'Germany',mp:1,w:1,d:0,l:0,gf:7,ga:1},{t:'Ivory Coast',mp:1,w:1,d:0,l:0,gf:1,ga:0},{t:'Ecuador',mp:1,w:0,d:0,l:1,gf:0,ga:1},{t:'Curaçao',mp:1,w:0,d:0,l:1,gf:1,ga:7}],
   F:[{t:'Sweden',mp:1,w:1,d:0,l:0,gf:5,ga:1},{t:'Japan',mp:1,w:0,d:1,l:0,gf:2,ga:2},{t:'Netherlands',mp:1,w:0,d:1,l:0,gf:2,ga:2},{t:'Tunisia',mp:1,w:0,d:0,l:1,gf:1,ga:5}],
   G:[{t:'New Zealand',mp:1,w:0,d:1,l:0,gf:2,ga:2},{t:'Iran',mp:1,w:0,d:1,l:0,gf:2,ga:2},{t:'Belgium',mp:1,w:0,d:1,l:0,gf:1,ga:1},{t:'Egypt',mp:1,w:0,d:1,l:0,gf:1,ga:1}],
@@ -567,21 +567,21 @@ const MATCHES = [
   {id:1,phase:'Group A',group:'A',date:'2026-06-11',day:'Thu, Jun 11',t1:'Mexico',t2:'South Africa',s1:2,s2:0,scorers1:"J. Quiñones 9', R. Jiménez 67'",scorers2:'—',venue:'Estadio Azteca',city:'Mexico City, MEX',time:'12:00 PM',done:true},
   {id:2,phase:'Group A',group:'A',date:'2026-06-11',day:'Thu, Jun 11',t1:'Korea Republic',t2:'Czechia',s1:2,s2:1,scorers1:"Hwang In-Beom 67', Oh Hyeon-gyu 80'",scorers2:"L. Krejčí 59'",venue:'Estadio Akron',city:'Guadalajara, MEX',time:'7:00 PM',done:true},
   {id:3,phase:'Group A',group:'A',date:'2026-06-18',day:'Thu, Jun 18',t1:'Czechia',t2:'South Africa',s1:1,s2:1,venue:'Mercedes-Benz Stadium',city:'Atlanta, USA',time:'9:00 AM',done:true},
-  {id:4,phase:'Group A',group:'A',date:'2026-06-18',day:'Thu, Jun 18',t1:'Mexico',t2:'Korea Republic',venue:'Estadio Akron',city:'Guadalajara, MEX',time:'6:00 PM',done:false},
+  {id:4,phase:'Group A',group:'A',date:'2026-06-18',day:'Thu, Jun 18',t1:'Mexico',t2:'Korea Republic',s1:2,s2:1,venue:'Estadio Akron',city:'Guadalajara, MEX',time:'6:00 PM',done:true},
   {id:5,phase:'Group B',group:'B',date:'2026-06-12',day:'Fri, Jun 12',t1:'Canada',t2:'Bosnia and Herzegovina',s1:1,s2:1,venue:'BMO Field',city:'Toronto, CAN',time:'12:00 PM',done:true},
   {id:6,phase:'Group B',group:'B',date:'2026-06-13',day:'Sat, Jun 13',t1:'Qatar',t2:'Switzerland',s1:1,s2:1,venue:"Levi's Stadium",city:'Santa Clara, USA',time:'12:00 PM',done:true},
-  {id:7,phase:'Group B',group:'B',date:'2026-06-18',day:'Thu, Jun 18',t1:'Switzerland',t2:'Bosnia and Herzegovina',s1:0,s2:0,venue:'SoFi Stadium',city:'Inglewood, USA',time:'12:00 PM',done:true},
+  {id:7,phase:'Group B',group:'B',date:'2026-06-18',day:'Thu, Jun 18',t1:'Switzerland',t2:'Bosnia and Herzegovina',s1:4,s2:1,venue:'SoFi Stadium',city:'Inglewood, USA',time:'12:00 PM',done:true},
   {id:8,phase:'Group B',group:'B',date:'2026-06-18',day:'Thu, Jun 18',t1:'Canada',t2:'Qatar',venue:'BC Place',city:'Vancouver, CAN',time:'3:00 PM',done:false},
   // GROUP C
   {id:9,phase:'Group C',group:'C',date:'2026-06-13',day:'Sat, Jun 13',t1:'Brazil',t2:'Morocco',s1:1,s2:1,venue:'MetLife Stadium',city:'East Rutherford, USA',time:'3:00 PM',done:true},
   {id:10,phase:'Group C',group:'C',date:'2026-06-13',day:'Sat, Jun 13',t1:'Haiti',t2:'Scotland',s1:0,s2:1,venue:'Gillette Stadium',city:'Foxborough, USA',time:'6:00 PM',done:true},
-  {id:11,phase:'Group C',group:'C',date:'2026-06-19',day:'Fri, Jun 19',t1:'Scotland',t2:'Morocco',venue:'Gillette Stadium',city:'Foxborough, USA',time:'3:00 PM',done:false},
-  {id:12,phase:'Group C',group:'C',date:'2026-06-19',day:'Fri, Jun 19',t1:'Brazil',t2:'Haiti',venue:'Lincoln Financial Field',city:'Philadelphia, USA',time:'5:30 PM',done:false},
+  {id:11,phase:'Group C',group:'C',date:'2026-06-19',day:'Fri, Jun 19',t1:'Scotland',t2:'Morocco',s1:0,s2:1,venue:'Gillette Stadium',city:'Foxborough, USA',time:'3:00 PM',done:true},
+  {id:12,phase:'Group C',group:'C',date:'2026-06-19',day:'Fri, Jun 19',t1:'Brazil',t2:'Haiti',s1:3,s2:0,venue:'Lincoln Financial Field',city:'Philadelphia, USA',time:'5:30 PM',done:true},
   // GROUP D
   {id:13,phase:'Group D',group:'D',date:'2026-06-12',day:'Fri, Jun 12',t1:'United States',t2:'Paraguay',s1:4,s2:1,venue:'SoFi Stadium',city:'Inglewood, USA',time:'6:00 PM',done:true},
   {id:14,phase:'Group D',group:'D',date:'2026-06-13',day:'Sat, Jun 13',t1:'Australia',t2:'Türkiye',s1:2,s2:0,venue:'BC Place',city:'Vancouver, CAN',time:'9:00 PM',done:true},
-  {id:15,phase:'Group D',group:'D',date:'2026-06-19',day:'Fri, Jun 19',t1:'United States',t2:'Australia',venue:'Lumen Field',city:'Seattle, USA',time:'12:00 PM',done:false},
-  {id:16,phase:'Group D',group:'D',date:'2026-06-19',day:'Fri, Jun 19',t1:'Türkiye',t2:'Paraguay',venue:"Levi's Stadium",city:'Santa Clara, USA',time:'8:00 PM',done:false},
+  {id:15,phase:'Group D',group:'D',date:'2026-06-19',day:'Fri, Jun 19',t1:'United States',t2:'Australia',s1:2,s2:0,venue:'Lumen Field',city:'Seattle, USA',time:'12:00 PM',done:true},
+  {id:16,phase:'Group D',group:'D',date:'2026-06-19',day:'Fri, Jun 19',t1:'Türkiye',t2:'Paraguay',s1:0,s2:1,venue:"Levi's Stadium",city:'Santa Clara, USA',time:'8:00 PM',done:true},
   // GROUP E
   {id:17,phase:'Group E',group:'E',date:'2026-06-14',day:'Sun, Jun 14',t1:'Germany',t2:'Curaçao',s1:7,s2:1,venue:'NRG Stadium',city:'Houston, USA',time:'10:00 AM',done:true},
   {id:18,phase:'Group E',group:'E',date:'2026-06-14',day:'Sun, Jun 14',t1:'Ivory Coast',t2:'Ecuador',s1:1,s2:0,venue:'Lincoln Financial Field',city:'Philadelphia, USA',time:'4:00 PM',done:true},
