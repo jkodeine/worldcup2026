@@ -381,7 +381,7 @@ body { background: var(--bg); color: var(--text); font-family: -apple-system, Bl
 
 <!-- ===== BRACKET TAB ===== -->
 <div class="tab-panel" id="tab-bracket">
-  <div class="bracket-note">⭐ Your favorite teams (🇰🇷 South Korea, 🇺🇸 USA, 🇭🇹 Haiti) are highlighted in blue. Group stage winners shown — knockout rounds update as teams advance.</div>
+  <div class="bracket-note">⭐ Your favorite teams (🇰🇷 South Korea, 🇺🇸 USA, 🏴󠁧󠁢󠁥󠁮󠁧󠁿 England) are highlighted in blue. Group stage winners shown — knockout rounds update as teams advance.</div>
   <div id="bracketContent"></div>
 </div>
 
@@ -416,7 +416,7 @@ body { background: var(--bg); color: var(--text); font-family: -apple-system, Bl
 // ============================================================
 // DATA
 // ============================================================
-const FAVORITES = ['South Korea', 'United States', 'Haiti'];
+const FAVORITES = ['South Korea', 'United States', 'England'];
 
 const FLAGS = {
   'Mexico':'🇲🇽','South Africa':'🇿🇦','Korea Republic':'🇰🇷','South Korea':'🇰🇷','Czechia':'🇨🇿',
@@ -839,11 +839,11 @@ function getTeamStoryBlurb(name, rank, teamPts, gp, oppName) {
     if (teamPts >= 3) return `The US have ${teamPts} pts and are still very much in the fight. Home-field advantage and a passionate crowd make every game at this World Cup feel electric for this young American squad.`;
     return `The USMNT need a big result against ${opp} to keep their knockout dreams alive — and the entire nation will be watching. Christian Pulisic and this resilient squad have shown they can rise to any occasion.`;
   }
-  if (name === 'Haiti') {
-    if (teamPts >= 4) return "Haiti are one of the tournament's great stories — this Caribbean nation is showing the world exactly what fearless football looks like. Every goal, every point is history in the making. 🇭🇹";
-    if (teamPts >= 1) return `Haiti have earned points on the world's biggest stage — a remarkable achievement for one of CONCACAF's most passionate football nations. Their journey to 2026 was already an inspiring one, and they're giving absolutely everything out there.`;
-    if (oppName === 'Brazil') return "The road is steep with Brazil up next, but Haiti's qualification for 2026 was already a historic milestone for Caribbean football. Playing the tournament favorites with zero pressure is a gift — expect them to be fearless, expressive, and fully backed by their passionate diaspora in the stands.";
-    return `Haiti are the underdogs, but their World Cup story is one of pure inspiration. Qualifying for 2026 was a landmark moment for Caribbean football, and every minute on this stage is history — their nation is watching with enormous pride.`;
+  if (name === 'England') {
+    if (teamPts >= 6) return "England have cruised through the group stage and are through to the knockouts — the Three Lions look sharp and are genuine contenders to go deep in this tournament. 🏴󠁧󠁢󠁥󠁮󠁧󠁿";
+    if (teamPts >= 3 && rank <= 2) return `England are in the top 2 of Group L with ${teamPts} pts after a strong opening. Harry Kane and this experienced squad know exactly how to win tournaments — they've been knocking on the door for years and this might finally be their moment.`;
+    if (teamPts >= 3) return `England have ${teamPts} pts and are still very much alive. The Three Lions have one of the most talented squads in the tournament — Kane, Bellingham, Saka — and will be dangerous in every remaining match.`;
+    return `England need a result against ${opp} to advance, but don't count them out — this squad has the quality to turn things around fast. The Three Lions always show up when it matters most.`;
   }
   return null;
 }
@@ -852,7 +852,7 @@ function renderFavorites(){
   const favs = [
     {name:'South Korea', dbName:'Korea Republic'},
     {name:'United States', dbName:'United States'},
-    {name:'Haiti', dbName:'Haiti'}
+    {name:'England', dbName:'England'}
   ];
   const grid = document.getElementById('favoritesGrid');
   grid.innerHTML = favs.map(f=>{
@@ -1004,7 +1004,7 @@ function renderFavGroupStandings(){
   const favGroups = [
     {grp:'A', favTeam:'South Korea'},
     {grp:'D', favTeam:'United States'},
-    {grp:'C', favTeam:'Haiti'}
+    {grp:'L', favTeam:'England'}
   ];
   const grid = document.getElementById('favGroupStandingsGrid');
   grid.innerHTML = favGroups.map(({grp, favTeam})=>{
@@ -1207,7 +1207,7 @@ function renderRankings(){
     const photoHtml = photoUrl
       ? `<img class="pr-card-photo" src="${photoUrl}" alt="${player.name}" onerror="this.parentElement.innerHTML='<div class=\\'pr-card-photo-fallback\\'>${player.flag}</div>'">`
       : `<div class="pr-card-photo-fallback">${player.flag}</div>`;
-    const isFavPlayer = player.country==='USA'||player.country==='Korea Republic'||player.country==='Haiti';
+    const isFavPlayer = player.country==='USA'||player.country==='Korea Republic'||player.country==='England';
 
     return `
     <div class="pr-player-card">
@@ -1236,7 +1236,7 @@ function renderRankings(){
 
   // Also render a compact top-10 table below the cards
   const tableRows = POWER_RANKINGS.overall.map(p=>{
-    const fav = p.country==='USA'||p.country==='Korea Republic'||p.country==='Haiti';
+    const fav = p.country==='USA'||p.country==='Korea Republic'||p.country==='England';
     const changeIcon = p.change>0?`<span style="color:var(--green);font-size:0.65rem">▲${p.change}</span>`:
                        p.change<0?`<span style="color:var(--red);font-size:0.65rem">▼${Math.abs(p.change)}</span>`:
                        `<span style="color:var(--text-muted);font-size:0.65rem">—</span>`;
