@@ -381,7 +381,7 @@ body { background: var(--bg); color: var(--text); font-family: -apple-system, Bl
 
 <!-- ===== BRACKET TAB ===== -->
 <div class="tab-panel" id="tab-bracket">
-  <div class="bracket-note">⭐ Your favorite teams (🇰🇷 South Korea, 🇺🇸 USA, 🏴󠁧󠁢󠁥󠁮󠁧󠁿 England) are highlighted in blue. Group stage winners shown — knockout rounds update as teams advance.</div>
+  <div class="bracket-note">⭐ Your favorite teams (🇺🇸 USA, 🏴󠁧󠁢󠁥󠁮󠁧󠁿 England) are highlighted in blue. Knockout rounds update as teams advance.</div>
   <div id="bracketContent"></div>
 </div>
 
@@ -416,7 +416,7 @@ body { background: var(--bg); color: var(--text); font-family: -apple-system, Bl
 // ============================================================
 // DATA
 // ============================================================
-const FAVORITES = ['South Korea', 'United States', 'England'];
+const FAVORITES = ['United States', 'England'];
 
 const FLAGS = {
   'Mexico':'🇲🇽','South Africa':'🇿🇦','Korea Republic':'🇰🇷','South Korea':'🇰🇷','Czechia':'🇨🇿',
@@ -825,13 +825,6 @@ function statusChip(m, today){
 // ============================================================
 function getTeamStoryBlurb(name, rank, teamPts, gp, oppName) {
   const opp = oppName || 'their next opponent';
-  if (name === 'South Korea') {
-    if (teamPts >= 6) return "South Korea have clinched their spot in the Round of 16 — a continuation of their remarkable knockout tradition stretching back to their legendary 4th-place run on home soil in 2002. 🏆";
-    if (teamPts >= 3 && rank <= 2) return `Sitting 2nd with ${teamPts} pts, South Korea are in control of their destiny. A strong result against ${opp} seals the deal — the Taeguk Warriors have reached the knockouts in back-to-back World Cups and know exactly how to handle this moment.`;
-    if (teamPts >= 3) return `South Korea have ${teamPts} pts but need a strong result to secure advancement. With Son Heung-min leading the line, they have the quality — this team has never been one to write off in a must-win situation.`;
-    if (gp === 0) return "South Korea are one of Asia's most decorated World Cup nations, with a legendary 4th-place finish on home soil in 2002. Their technical, high-energy style makes every match a must-watch.";
-    return `South Korea need a result against ${opp} to stay alive — and this team thrives under pressure. Their never-say-die mentality has produced some of the tournament's most memorable moments over the years.`;
-  }
   if (name === 'United States') {
     if (teamPts >= 6) return "The USMNT are through to the knockouts, lighting up home crowds at every venue. This young, European-based squad is delivering the tournament America has been dreaming of. 🇺🇸";
     if (oppName === 'Australia') return "The USA top Group D after a commanding 4-1 win over Paraguay. Next up: Australia — the Socceroos are no pushovers (they made the Round of 16 in 2022 and beat Turkey 2-0 in their opener), but with home-field advantage and incredible momentum, the USMNT are strong favorites to take all 3 points.";
@@ -850,7 +843,6 @@ function getTeamStoryBlurb(name, rank, teamPts, gp, oppName) {
 
 function renderFavorites(){
   const favs = [
-    {name:'South Korea', dbName:'Korea Republic'},
     {name:'United States', dbName:'United States'},
     {name:'England', dbName:'England'}
   ];
@@ -1000,9 +992,8 @@ function renderFullSchedule(){
 // RENDER FAV GROUP STANDINGS (Home tab mini tables)
 // ============================================================
 function renderFavGroupStandings(){
-  // Groups A (South Korea), D (USA), C (Haiti)
+  // Groups D (USA), L (England)
   const favGroups = [
-    {grp:'A', favTeam:'South Korea'},
     {grp:'D', favTeam:'United States'},
     {grp:'L', favTeam:'England'}
   ];
@@ -1126,26 +1117,7 @@ function renderBracket(){
   // For group stage, show final standings per group
   let html = '';
 
-  // Group Stage summary
-  html += `<div class="bracket-stage"><span class="bracket-stage-title">Group Stage — Final Standings</span><div class="bracket-grid">`;
-  Object.entries(STANDINGS).forEach(([grp,])=>{
-    const teams = getEffectiveStandings(grp);
-    const sorted = [...teams].sort((a,b)=>pts(b)-pts(a)||gd(b)-gd(a)||b.gf-a.gf);
-    html += `<div class="bracket-match"><div style="padding:6px 12px;background:var(--group-header);color:var(--group-header-text);font-size:0.75rem;font-weight:800;letter-spacing:1px">GROUP ${grp}</div>`;
-    sorted.forEach((t,i)=>{
-      const fav = isFav(t.t)||isFav(teamAlias(t.t));
-      const isAdv = i<2;
-      html += `<div class="bracket-team${isAdv?' winner':''}${fav?' fav':''}">
-        <span class="flag">${flag(t.t)}</span>
-        <span class="name">${i===0?'🥇 ':i===1?'🥈 ':''}${t.t}</span>
-        <span class="score">${pts(t)}pts</span>
-      </div>`;
-    });
-    html += `</div>`;
-  });
-  html += `</div></div>`;
-
-  // Knockout rounds
+  // Knockout rounds first
   ['Round of 32','Round of 16','Quarterfinals','Semifinals','Final'].forEach(phase=>{
     const ms = phaseMatches[phase]||[];
     if(!ms.length) return;
@@ -1183,6 +1155,25 @@ function renderBracket(){
     html += `</div></div>`;
   }
 
+  // Group Stage summary at the bottom
+  html += `<div class="bracket-stage"><span class="bracket-stage-title">Group Stage — Final Standings</span><div class="bracket-grid">`;
+  Object.entries(STANDINGS).forEach(([grp,])=>{
+    const teams = getEffectiveStandings(grp);
+    const sorted = [...teams].sort((a,b)=>pts(b)-pts(a)||gd(b)-gd(a)||b.gf-a.gf);
+    html += `<div class="bracket-match"><div style="padding:6px 12px;background:var(--group-header);color:var(--group-header-text);font-size:0.75rem;font-weight:800;letter-spacing:1px">GROUP ${grp}</div>`;
+    sorted.forEach((t,i)=>{
+      const fav = isFav(t.t)||isFav(teamAlias(t.t));
+      const isAdv = i<2;
+      html += `<div class="bracket-team${isAdv?' winner':''}${fav?' fav':''}">
+        <span class="flag">${flag(t.t)}</span>
+        <span class="name">${i===0?'🥇 ':i===1?'🥈 ':''}${t.t}</span>
+        <span class="score">${pts(t)}pts</span>
+      </div>`;
+    });
+    html += `</div>`;
+  });
+  html += `</div></div>`;
+
   document.getElementById('bracketContent').innerHTML = html;
 }
 
@@ -1207,7 +1198,7 @@ function renderRankings(){
     const photoHtml = photoUrl
       ? `<img class="pr-card-photo" src="${photoUrl}" alt="${player.name}" onerror="this.parentElement.innerHTML='<div class=\\'pr-card-photo-fallback\\'>${player.flag}</div>'">`
       : `<div class="pr-card-photo-fallback">${player.flag}</div>`;
-    const isFavPlayer = player.country==='USA'||player.country==='Korea Republic'||player.country==='England';
+    const isFavPlayer = player.country==='USA'||player.country==='England';
 
     return `
     <div class="pr-player-card">
@@ -1236,7 +1227,7 @@ function renderRankings(){
 
   // Also render a compact top-10 table below the cards
   const tableRows = POWER_RANKINGS.overall.map(p=>{
-    const fav = p.country==='USA'||p.country==='Korea Republic'||p.country==='England';
+    const fav = p.country==='USA'||p.country==='England';
     const changeIcon = p.change>0?`<span style="color:var(--green);font-size:0.65rem">▲${p.change}</span>`:
                        p.change<0?`<span style="color:var(--red);font-size:0.65rem">▼${Math.abs(p.change)}</span>`:
                        `<span style="color:var(--text-muted);font-size:0.65rem">—</span>`;
@@ -1287,7 +1278,7 @@ function renderBaseCamps(filter='all'){
     .filter(b=>filter==='all'||b.host===filter)
     .sort((a,b)=>a.country.localeCompare(b.country))
     .map(b=>{
-      const fav = isFav(b.country)||(b.country==='Korea Republic');
+      const fav = isFav(b.country);
       const hostChip = `<span class="host-chip host-${b.host.toLowerCase()}">${b.host==='USA'?'🇺🇸 USA':b.host==='MEX'?'🇲🇽 MEX':'🇨🇦 CAN'}</span>`;
       return `<tr class="${fav?'fav-row':''}">
         <td><span class="bc-flag">${b.flag}</span></td>
