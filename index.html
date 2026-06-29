@@ -348,10 +348,10 @@ body { background: var(--bg); color: var(--text); font-family: -apple-system, Bl
 <div class="tabs-wrap">
   <button class="tab-btn active" onclick="switchTab('home',this)">🏠 Home</button>
   <button class="tab-btn" onclick="switchTab('schedule',this)">📅 Schedule</button>
-  <button class="tab-btn" onclick="switchTab('standings',this)">📊 Standings</button>
   <button class="tab-btn" onclick="switchTab('bracket',this)">🏆 Bracket</button>
   <button class="tab-btn" onclick="switchTab('rankings',this)">⚡ Power Rankings</button>
   <button class="tab-btn" onclick="switchTab('camps',this)">🏕️ Base Camps</button>
+  <button class="tab-btn" onclick="switchTab('standings',this)">📊 Standings</button>
 </div>
 
 <!-- ===== HOME TAB ===== -->
@@ -360,10 +360,7 @@ body { background: var(--bg); color: var(--text); font-family: -apple-system, Bl
   <div class="section-title">⭐ <span class="highlight">My Favorites</span> — Current Standing &amp; Next Game</div>
   <div class="favorites-grid" id="favoritesGrid"></div>
 
-  <div class="section-title">📊 <span class="highlight">Group Standings</span> — My Favorites' Groups</div>
-  <div class="mini-standings-grid" id="favGroupStandingsGrid"></div>
-
-  <div class="section-title">📅 Schedule — Today &amp; Tomorrow</div>
+  <div class="section-title">📅 <span class="highlight">Schedule</span> — Today &amp; Tomorrow</div>
   <div id="homeScheduleContent"></div>
 </div>
 
@@ -966,10 +963,10 @@ function renderDaySections(matches, today, tomorrow){
 }
 
 function renderSchedule(){
+  // Mirror of renderFullSchedule but capped at tomorrow — same data, same cards
   const today = getTodayPDT();
   const tmObj = new Date(today+'T12:00:00Z'); tmObj.setDate(tmObj.getDate()+1);
   const tomorrow = tmObj.toISOString().split('T')[0];
-  // Home: today + tomorrow only (all phases)
   const relevant = MATCHES.filter(m=>m.date>=today && m.date<=tomorrow);
   const html = renderDaySections(relevant, today, tomorrow);
   document.getElementById('homeScheduleContent').innerHTML = html ||
