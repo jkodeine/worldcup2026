@@ -545,7 +545,7 @@ async function fetchLiveData(){
   }
 }
 
-// All 12 groups standings (from Fox Sports live, June 18 2026)
+// All 12 groups standings — FINAL (group stage ended June 27, 2026)
 const STANDINGS = {
   A:[{t:'Mexico',mp:3,w:3,d:0,l:0,gf:7,ga:1},{t:'South Africa',mp:3,w:1,d:1,l:1,gf:2,ga:3},{t:'South Korea',mp:3,w:1,d:0,l:2,gf:3,ga:4},{t:'Czechia',mp:3,w:0,d:1,l:2,gf:2,ga:6}],
   B:[{t:'Switzerland',mp:3,w:2,d:1,l:0,gf:8,ga:3},{t:'Canada',mp:3,w:1,d:1,l:1,gf:8,ga:4},{t:'Bosnia and Herzegovina',mp:3,w:1,d:1,l:1,gf:5,ga:6},{t:'Qatar',mp:3,w:0,d:1,l:2,gf:2,ga:10}],
@@ -969,11 +969,11 @@ function renderSchedule(){
   const today = getTodayPDT();
   const tmObj = new Date(today+'T12:00:00Z'); tmObj.setDate(tmObj.getDate()+1);
   const tomorrow = tmObj.toISOString().split('T')[0];
-  // Home: today + tomorrow only
-  const relevant = MATCHES.filter(m=>m.date>=today && m.date<=tomorrow && m.group);
+  // Home: today + tomorrow only (all phases)
+  const relevant = MATCHES.filter(m=>m.date>=today && m.date<=tomorrow);
   const html = renderDaySections(relevant, today, tomorrow);
   document.getElementById('homeScheduleContent').innerHTML = html ||
-    `<p style="color:var(--text-muted);padding:12px 0">No group stage matches today or tomorrow.</p>`;
+    `<p style="color:var(--text-muted);padding:12px 0">No matches today or tomorrow.</p>`;
 }
 
 function renderFullSchedule(){
